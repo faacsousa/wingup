@@ -419,11 +419,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
 		curl = curl_easy_init();
 		if (curl) 
 		{
-			std::string urlComplete = gupParams.getInfoLocation() + "?version=";
+			std::string infoLocation = gupParams.getInfoLocation();
+			size_t queryPosition = infoLocation.find("?");
+
+			std::string versionComplete = "?version=";
 			if (version != "")
-				urlComplete += version;
+				versionComplete += version;
 			else
-				urlComplete += gupParams.getCurrentVersion();
+				versionComplete += gupParams.getCurrentVersion();
+
+			std::string urlComplete;
+			if (queryPosition != string::npos) {
+				urlComplete = infoLocation.replace(queryPosition, 1, versionComplete + "&");
+			}
+			else {
+				urlComplete = infoLocation + versionComplete;
+			}			
 
 			curl_easy_setopt(curl, CURLOPT_URL, urlComplete.c_str());
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, TRUE);
